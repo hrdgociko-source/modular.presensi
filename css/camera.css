@@ -1,0 +1,61 @@
+#video-container {
+  position:relative; width:220px; height:220px; margin:0 auto;
+  border-radius:50%; overflow:hidden; border:5px solid transparent;
+  background:linear-gradient(white,white) padding-box,
+             linear-gradient(135deg,#FF8C00,#FF4B2B) border-box;
+  box-shadow:0 0 0 6px rgba(255,140,0,0.15);
+}
+#video-container.scanning { animation:pulse-ring 1.5s ease-in-out infinite; }
+@keyframes pulse-ring {
+  0%,100%{ box-shadow:0 0 0 6px rgba(255,140,0,0.15) }
+  50%    { box-shadow:0 0 0 14px rgba(255,140,0,0.05) }
+}
+#video-container.success {
+  background:linear-gradient(white,white) padding-box,
+             linear-gradient(135deg,#22c55e,#16a34a) border-box;
+  box-shadow:0 0 0 6px rgba(34,197,94,0.2);
+}
+#video-container.error {
+  background:linear-gradient(white,white) padding-box,
+             linear-gradient(135deg,#ef4444,#dc2626) border-box;
+}
+#video-container.blink-mode {
+  background:linear-gradient(white,white) padding-box,
+             linear-gradient(135deg,#3b82f6,#1d4ed8) border-box;
+  box-shadow:0 0 0 6px rgba(59,130,246,0.15);
+  animation:pulse-blue 1s ease-in-out infinite;
+}
+@keyframes pulse-blue {
+  0%,100%{ box-shadow:0 0 0 6px rgba(59,130,246,0.15) }
+  50%    { box-shadow:0 0 0 14px rgba(59,130,246,0.04) }
+}
+video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
+#scan-overlay { position:absolute; inset:0; border-radius:50%; pointer-events:none; }
+.scan-line {
+  position:absolute; left:10%; right:10%; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,140,0,0.8),transparent);
+  animation:scan 2s ease-in-out infinite; display:none;
+}
+.scanning .scan-line { display:block; }
+@keyframes scan {
+  0%  { top:15%; opacity:0 }
+  10% { opacity:1 }
+  90% { opacity:1 }
+  100%{ top:85%; opacity:0 }
+}
+
+/* ===== Mode HP lowend: matikan efek berat agar GPU/CPU fokus ke deteksi ===== */
+.lowend body::before { display:none; }
+.lowend .glass-card { box-shadow:none; }
+.lowend #video-container,
+.lowend #video-container.scanning,
+.lowend #video-container.blink-mode { animation:none; box-shadow:none; }
+.lowend .scan-line,
+.lowend .dot.pulse,
+.lowend .spinner,
+.lowend .check-circle { animation-duration:0s; }
+.lowend .spinner { animation:spin 1.2s linear infinite; }
+.lowend .progress-fill { transition:none; }
+@media (prefers-reduced-motion: reduce) {
+  #video-container, .scan-line, .dot.pulse { animation:none !important; }
+}
