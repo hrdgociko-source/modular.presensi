@@ -2,33 +2,33 @@
 // CACHE — OUTLETS
 // ============================================================
 async function loadOutletsCache() {
+  let remoteVer = 0;
   try {
-    const remoteVer = (await apiGet({
+    remoteVer = (await apiGet({
       action:'get_cache_version', key:'outlets'
     })).version || 0;
-    const localVer = parseInt(localStorage.getItem(KEY_VER_OUTLETS) || '0');
+  } catch(e) {
+    console.warn('[Cache] Cek versi gagal, lanjut fetch langsung');
+  }
 
-    if (localVer >= remoteVer && localVer > 0) {
-      const cached = localStorage.getItem(KEY_OUTLETS);
-      if (cached) {
-        console.log('[Cache] Outlets dari localStorage');
-        return JSON.parse(cached);
-      }
-    }
+  const localVer = parseInt(localStorage.getItem(KEY_VER_OUTLETS) || '0');
+  const cached   = localStorage.getItem(KEY_OUTLETS);
 
-    console.log('[Cache] Fetch outlets dari GAS');
+  if (remoteVer && localVer >= remoteVer && cached && JSON.parse(cached).length) {
+    return JSON.parse(cached);
+  }
+
+  try {
     const data = await apiGet({ action:'get_outlets_full' });
-    if (data.outlets) {
-      localStorage.setItem(KEY_OUTLETS,     JSON.stringify(data.outlets));
+    if (data.outlets && data.outlets.length > 0) {
+      localStorage.setItem(KEY_OUTLETS, JSON.stringify(data.outlets));
       localStorage.setItem(KEY_VER_OUTLETS, String(remoteVer || Date.now()));
+      return data.outlets;
     }
-    return data.outlets || [];
-
   } catch(e) {
     console.warn('[Cache] Gagal load outlets:', e);
-    const cached = localStorage.getItem(KEY_OUTLETS);
-    return cached ? JSON.parse(cached) : [];
   }
+  return cached ? JSON.parse(cached) : [];
 }
 
 // ============================================================
